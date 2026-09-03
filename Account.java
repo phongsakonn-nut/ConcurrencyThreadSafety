@@ -9,10 +9,10 @@
  */
 public class Account {
 
-    private final int id;
+    private final int id; //final เพราะเลขบชเปลี่ยนไม่ได้
 
     /** ยอดเงินคงเหลือ — จุดที่เธรดหลายตัวแย่งกันเขียน */
-    private int balance;
+    private int balance; //เป็น int เพราะการคำนวณจะได้ไม่มีปัญหาเงินหาย
 
     /**
      * @param id            เลขบัญชี ต้องไม่ซ้ำกันในระบบเดียวกัน
@@ -38,7 +38,7 @@ public class Account {
     // คำใบ้: ถ้าเธรด A เพิ่งเขียน balance ลงไป เธรด B ที่อ่านตอนนี้
     //        รับประกันได้หรือไม่ว่าจะเห็นค่าใหม่ ไม่ใช่ค่าเก่าที่ค้างในแคชของ CPU
     // ---------------------------------------------------------------
-    public int balance() {
+    public synchronized int balance() { //เติม synchronized เพราะ
         return balance;
     }
 
@@ -48,7 +48,7 @@ public class Account {
     // บรรทัด balance = balance + amount; ดูเหมือนคำสั่งเดียว
     // แต่จริง ๆ คือ อ่าน → บวก → เขียน สามจังหวะที่ถูกแทรกกลางคันได้
     // ---------------------------------------------------------------
-    public void deposit(int amount) {
+    public synchronized void deposit(int amount) { //เติม synchronized เพราะไม่งั้น balamce จะเพื้ยน
         if (amount <= 0) {
             throw new IllegalArgumentException("amount must be positive");
         }
@@ -64,7 +64,7 @@ public class Account {
     //
     // @return true ถ้าถอนสำเร็จ, false ถ้าเงินไม่พอ
     // ---------------------------------------------------------------
-    public boolean withdraw(int amount) {
+    public synchronized boolean withdraw(int amount) { //เติม synchronized เพราะ
         if (amount <= 0) {
             throw new IllegalArgumentException("amount must be positive");
         }
