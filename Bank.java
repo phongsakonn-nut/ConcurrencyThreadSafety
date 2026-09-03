@@ -19,7 +19,7 @@ public class Bank {
      * @return true ถ้าโอนสำเร็จ, false ถ้าเงินต้นทางไม่พอ
      * @throws IllegalArgumentException ถ้า argument ไม่ถูกต้อง หรือโอนเข้าบัญชีตัวเอง
      */
-    public static boolean transfer(Account from, Account to, int amount) {
+    public static boolean transfer(Account from, Account to, int amount) { //เติม synchronized ได้ แต่ไม่ควร
         if (from == null || to == null) {
             throw new IllegalArgumentException("accounts must not be null");
         }
@@ -45,14 +45,25 @@ public class Bank {
         //
         // ห้ามแก้ด้วยการเอาล็อกใบใดใบหนึ่งออก — ยอดรวมจะเพี้ยน
         // ---------------------------------------------------------------
-        synchronized (from) {
-            synchronized (to) {
-                if (!from.withdraw(amount)) {
-                    return false;
+        
+        /* ที่อาจารย์เขียนให้ดูเป้นตัวอย่าง
+           Account first = from ;
+           Account second = to ;
+           if(from.id() < to.id()){
+           first = from;
+           second = to; } */
+           
+        Account first = (from.id() < to.id()) ? from : to; //ลำดับแรกที่ล็อก เพราะถ้าโอนจาก A ไป B จะล็อก A ก่อน แล้วค่อย B แต่ถ้าโอนจาก B ไป A จะล็อก B ก่อน แล้วค่อย A
+            Account second = (first == from) ? to : from; //ลำดับสองที่ล็อก เพราะถ้าโอนจาก A ไป B จะล็อก A ก่อน แล้วค่อย B แต่ถ้าโอนจาก B ไป A จะล็อก B ก่อน แล้วค่อย A
+            synchronized (first){//ล็อกอันแรกก่อน
+                synchronized (second){//ล็อกอันที่สอง 
+                    if (from.withdraw(amount)) {
+                        to.deposit(amount);
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
-                to.deposit(amount);
-                return true;
-            }
-        }
+            }     
     }
 }

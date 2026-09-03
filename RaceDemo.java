@@ -26,7 +26,7 @@ public class RaceDemo {
         int worst = 0;
 
         for (int round = 1; round <= ROUNDS; round++) {
-            int actual = runOneRound();
+            int actual = runOneRound(); //สร้าง thread ขึ้นมาแล้วรันการฝากเงินหลาย ๆ ครั้งพร้อมกัน แล้วคืนยอดสุดท้ายที่ได้
             int lost = EXPECTED - actual;
 
             if (lost != 0) {
@@ -63,20 +63,20 @@ public class RaceDemo {
         final Account acc = new Account(1, 0);
         Thread[] workers = new Thread[THREADS];
 
-        for (int i = 0; i < THREADS; i++) {
+        for (int i = 0; i < THREADS; i++) { //ทำการสร้าง thread ขึ้นมา 4 ตัว แต่ละตัวจะฝากเงิน 1 บาท 5หมื่นครั้ง
             workers[i] = new Thread(new Runnable() {
                 public void run() {
-                    for (int k = 0; k < OPS_PER_THREAD; k++) {
+                    for (int k = 0; k < OPS_PER_THREAD; k++) { //ฝากเงิน 1 บาท 5หมื่นครั้ง จากคน 4 คนพร้อมกัน
                         acc.deposit(1);
                     }
                 }
             });
         }
 
-        for (int i = 0; i < THREADS; i++) {
+        for (int i = 0; i < THREADS; i++) { //เริ่มต้นทำงาน thread ทั้งหมด
             workers[i].start();
         }
-        for (int i = 0; i < THREADS; i++) {
+        for (int i = 0; i < THREADS; i++) { //ทำงานเสร็จ 
             workers[i].join();
         }
 
